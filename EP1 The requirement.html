@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Project 160 Payload-Range · Design Point</title>
+<meta name="description" content="Companion page for How an Airliner Is Designed, episode 1: an interactive payload-range diagram for Project 160.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230d1828'/%3E%3Cpath d='M4 24 L14 24 L20 14 L28 8' fill='none' stroke='%23c9d6e4' stroke-width='2.5'/%3E%3Crect x='16' y='14' width='6' height='6' fill='%23e8834a' transform='rotate(45 19 17)'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one blueprint sheet, dark navy by design (matches the channel's video look); controls left of the chart on wide screens, stacked on phones. */
+:root{
+  --bg:#0d1828; --sheet:#112036; --panel:#152842; --ink:#e9eff6; --muted:#93a6bb; --grid:#22395a; --line:#c9d6e4;
+  --accent:#e8834a; --ok:#6cc59a; --bad:#ef6f62;
+  --display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);padding:0 16px;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:32px 32px;background-position:-1px -1px}
+main{max-width:1040px;margin:0 auto;padding-block:36px 64px;display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line);padding-bottom:16px}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+h1{font:700 48px/1 var(--display);margin:0;letter-spacing:.02em;text-wrap:balance}
+h2{font:600 24px/1.2 var(--display);margin:0;letter-spacing:.03em;text-transform:uppercase}
+p{margin:0;max-width:68ch;color:var(--muted)}
+.tag{font:500 11px var(--mono);color:var(--accent);border:1px solid var(--accent);padding:1px 6px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+section{background:color-mix(in srgb,var(--sheet) 92%,transparent);border:1px solid var(--grid);padding:20px;display:flex;flex-direction:column;gap:14px}
+.row{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start}
+.row>*{min-width:0}
+@media (max-width:760px){.row{grid-template-columns:1fr}h1{font-size:36px}}
+.ctl{display:flex;flex-direction:column;gap:14px}
+.ctl label{display:flex;flex-direction:column;gap:4px;font:500 12px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ctl .v{color:var(--ink);font-size:14px}
+.ctl input[type=range]{width:100%;accent-color:var(--accent)}
+.ctl input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+button{font:500 12px var(--mono);padding:7px 12px;background:transparent;color:var(--ink);border:1px solid var(--line);cursor:pointer;letter-spacing:.04em}
+button:hover{border-color:var(--accent);color:var(--accent)}
+.status{font:500 13px var(--mono);padding:8px 10px;border-left:3px solid var(--ok);background:var(--panel)}
+.status.bad{border-color:var(--bad)}
+.chart{overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;min-width:520px}
+svg text{font-family:var(--mono);font-size:12px;fill:var(--muted)}
+svg .ink{fill:var(--ink)} svg .acc{fill:var(--accent)} svg .big{font-size:14px;font-weight:500}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+.tbl{overflow-x:auto}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--grid)}
+th{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td.n{font-family:var(--mono);text-align:right;white-space:nowrap}
+.req{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.req div{background:var(--panel);border:1px solid var(--grid);padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.req b{font:600 12px var(--mono);color:var(--accent)}
+.req span{font-size:14px}
+.req em{font-style:normal;font:12px var(--mono);color:var(--muted)}
+.src{font-size:13px;color:var(--muted)} .src a{color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="eyebrow">Design Point · How an Airliner Is Designed · Episode 1 · Companion page</div>
+  <h1>Project 160 Payload-Range</h1>
+  <p>Move the sliders to see how the wing, the engine and the weight limits shape what Project 160 can carry and how far. Values marked <span class="tag">representative</span> are teaching numbers, not Boeing or Airbus data.</p>
+</header>
+
+<section>
+  <h2>Payload-range diagram</h2>
+  <div class="row">
+    <div class="ctl">
+      <label for="ld">Wing lift-to-drag L/D <span class="v" id="ldv"></span><input id="ld" type="range" min="14" max="20" step="0.5" value="17"></label>
+      <label for="sfc">Engine fuel burn c (per hour) <span class="v" id="sfcv"></span><input id="sfc" type="range" min="0.50" max="0.66" step="0.01" value="0.56"></label>
+      <label for="mtow">Max takeoff weight (t) <span class="v" id="mtowv"></span><input id="mtow" type="range" min="74" max="84" step="0.5" value="79"></label>
+      <label for="pax">Design passengers <span class="v" id="paxv"></span><input id="pax" type="range" min="140" max="189" step="1" value="160"></label>
+      <label for="rng">Design range (nm) <span class="v" id="rngv"></span><input id="rng" type="range" min="2500" max="3600" step="50" value="3000"></label>
+      <div class="btns"><button id="draw" type="button">Draw step by step</button><button id="reset" type="button">Reset</button></div>
+      <div class="status" id="status" role="status"></div>
+    </div>
+    <div class="chart"><svg id="pr" viewBox="0 0 700 430" role="img" aria-label="Payload against range for Project 160"></svg></div>
+  </div>
+  <div class="tbl"><table id="pts"><thead><tr><th>Point</th><th>Payload</th><th>Fuel</th><th>Takeoff weight</th><th>Range</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section>
+  <h2>Weight on the design flight</h2>
+  <div class="chart"><svg id="ws" viewBox="0 0 700 150" role="img" aria-label="Takeoff weight broken into empty weight, payload and fuel"></svg></div>
+</section>
+
+<section>
+  <h2>The design mission</h2>
+  <p>"3,000 nm" always carries more fuel than the trip: a 5 % contingency, a diversion to an alternate airport and 30 minutes of holding.</p>
+  <div class="btns"><button id="fly" type="button">Fly the mission</button></div>
+  <div class="chart"><svg id="ms" viewBox="0 0 700 240" role="img" aria-label="Mission profile with climb, cruise, descent, diversion and holding"></svg></div>
+</section>
+
+<section>
+  <h2>Where Project 160 sits</h2>
+  <div class="chart"><svg id="sc" viewBox="0 0 700 300" role="img" aria-label="Seats against range for A320ceo, A320neo, 737-800, 737 MAX 8 and the Project 160 target"></svg></div>
+</section>
+
+<section>
+  <h2>Requirements, issue 1</h2>
+  <div class="req">
+    <div><b>R1</b><span>160 passengers, two-class</span><em>up to 189 single-class</em></div>
+    <div><b>R2</b><span>3,000 nm with 160 passengers</span><em>with reserves</em></div>
+    <div><b>R3</b><span>20 t maximum payload</span><em>representative</em></div>
+    <div><b>R4</b><span>Cruise Mach 0.78</span><em>initial cruise ≥ 35,000 ft</em></div>
+    <div><b>R5</b><span>Takeoff ≤ 2,300 m</span><em>MTOW, sea level, ISA</em></div>
+    <div><b>R6</b><span>Approach ≤ 140 kt</span><em>ICAO approach category C</em></div>
+    <div><b>R7</b><span>Wingspan &lt; 36 m</span><em>ICAO aerodrome code C</em></div>
+    <div><b>R8</b><span>35 min turnaround</span><em>objective · no jet bridge</em></div>
+    <div><b>R9</b><span>−15 % fuel per seat</span><em>objective · vs aircraft replaced</em></div>
+    <div><b>R10</b><span>CS-25 / FAR Part 25</span><em>certification basis</em></div>
+    <div><b>R11</b><span>ICAO Annex 16 Chapter 14</span><em>noise</em></div>
+  </div>
+</section>
+
+<p class="src">Real aircraft data: <a href="https://en.wikipedia.org/wiki/Airbus_A320_family" target="_blank" rel="noopener">A320ceo</a>, <a href="https://en.wikipedia.org/wiki/Airbus_A320neo_family" target="_blank" rel="noopener">A320neo</a>, <a href="https://en.wikipedia.org/wiki/Boeing_737_Next_Generation" target="_blank" rel="noopener">737-800</a>, <a href="https://en.wikipedia.org/wiki/Boeing_737_MAX" target="_blank" rel="noopener">737 MAX 8</a>, <a href="https://skybrary.aero/articles/icao-aerodrome-reference-code" target="_blank" rel="noopener">ICAO aerodrome code</a>. Project 160 numbers are representative teaching values. Design Point is an independent channel, not affiliated with Boeing or Airbus.</p>
+</main>
+
+<script>
+(function(){
+const NS="http://www.w3.org/2000/svg";
+const el=(p,t,a,txt)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!==undefined)e.textContent=txt;p.appendChild(e);return e;};
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $=id=>document.getElementById(id);
+const OEW=41500,MAXFUEL=20800,MAXPL=20000,FIXED=1500,RES=2400,V=450;
+const fmt=n=>Math.round(n).toLocaleString("en-US");
+const S={ld:17,sfc:0.56,mtow:79000,pax:160,rng:3000};
+function range(K,payload,fuel){const tow=OEW+payload+fuel;const trip=(fuel-RES)/1.05;const cruise=trip-FIXED;if(cruise<=0)return 0;const w0=tow-FIXED*0.7;return K*Math.log(w0/(w0-cruise))+150;}
+function fuelFor(K,R,payload){let lo=3000,hi=40000;for(let i=0;i<60;i++){const m=(lo+hi)/2;if(range(K,payload,m)<R)lo=m;else hi=m;}return (lo+hi)/2;}
+function model(){const K=V/S.sfc*S.ld;const M=S.mtow;
+  const fA=Math.min(MAXFUEL,M-OEW-MAXPL);const A={pl:MAXPL,f:fA,tow:OEW+MAXPL+fA,r:range(K,MAXPL,fA)};
+  const plB=Math.max(0,M-OEW-MAXFUEL);const B={pl:plB,f:MAXFUEL,tow:OEW+plB+MAXFUEL,r:range(K,plB,MAXFUEL)};
+  const C={pl:0,f:MAXFUEL,tow:OEW+MAXFUEL,r:range(K,0,MAXFUEL)};
+  const pl=S.pax*100;const fd=fuelFor(K,S.rng,pl);const D={pl,f:fd,tow:OEW+pl+fd,r:S.rng};
+  return {K,A,B,C,D,ok:D.tow<=M&&fd<=MAXFUEL};}
+
+/* payload-range chart */
+const pr=$("pr");const x0=70,x1=670,y0=370,y1=30,RX=5000,PY=22;
+const X=r=>x0+(x1-x0)*r/RX,Y=p=>y0-(y0-y1)*p/(PY*1000);
+let lineEl,ptsG;
+function axes(){pr.innerHTML="";
+  for(let r=0;r<=RX;r+=1000){el(pr,"line",{x1:X(r),x2:X(r),y1:y0,y2:y1,stroke:css("--grid")});el(pr,"text",{x:X(r),y:y0+20,"text-anchor":"middle"},r.toLocaleString("en-US"));}
+  for(let p=0;p<=20;p+=5){el(pr,"line",{x1:x0,x2:x1,y1:Y(p*1000),y2:Y(p*1000),stroke:css("--grid")});el(pr,"text",{x:x0-10,y:Y(p*1000)+4,"text-anchor":"end"},p);}
+  el(pr,"line",{x1:x0,x2:x1,y1:y0,y2:y0,stroke:css("--line")});el(pr,"line",{x1:x0,x2:x0,y1:y0,y2:y1,stroke:css("--line")});
+  el(pr,"text",{x:(x0+x1)/2,y:y0+46,"text-anchor":"middle",class:"ink"},"Range (nm)");
+  el(pr,"text",{x:20,y:(y0+y1)/2,transform:`rotate(-90 20 ${(y0+y1)/2})`,"text-anchor":"middle",class:"ink"},"Payload (t)");
+  lineEl=el(pr,"polyline",{fill:"none",stroke:css("--line"),"stroke-width":2.5,"stroke-linejoin":"round"});
+  ptsG=el(pr,"g",{});}
+function drawPR(m){
+  const pts=[[0,MAXPL],[m.A.r,m.A.pl],[m.B.r,m.B.pl],[m.C.r,0]];
+  lineEl.setAttribute("points",pts.map(p=>`${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(" "));
+  ptsG.innerHTML="";
+  const lab=(p,t,dx,dy,anc,cls)=>{el(ptsG,"circle",{cx:X(p.r),cy:Y(p.pl),r:5,fill:css("--ink")});el(ptsG,"text",{x:X(p.r)+dx,y:Y(p.pl)+dy,"text-anchor":anc||"start",class:cls||"ink"},t);};
+  lab(m.A,`A  ${fmt(m.A.r)} nm`,8,-10);lab(m.B,`B  ${fmt(m.B.r)} nm`,10,-8);lab(m.C,`C  ${fmt(m.C.r)} nm`,-8,-12,"end");
+  const c=m.ok?css("--accent"):css("--bad");
+  el(ptsG,"line",{x1:X(m.D.r),x2:X(m.D.r),y1:y0,y2:Y(m.D.pl),stroke:c,"stroke-dasharray":"4 4"});
+  el(ptsG,"line",{x1:x0,x2:X(m.D.r),y1:Y(m.D.pl),y2:Y(m.D.pl),stroke:c,"stroke-dasharray":"4 4"});
+  el(ptsG,"rect",{x:X(m.D.r)-7,y:Y(m.D.pl)-7,width:14,height:14,fill:c,transform:`rotate(45 ${X(m.D.r)} ${Y(m.D.pl)})`});
+  el(ptsG,"text",{x:X(m.D.r)-12,y:Y(m.D.pl)+24,"text-anchor":"end",class:"acc big",fill:c},`Design point · ${S.pax} pax · ${fmt(S.rng)} nm`);
+  el(ptsG,"text",{x:x1,y:y1+4,"text-anchor":"end"},`MTOW ${fmt(S.mtow/1000)} t · tanks ${MAXFUEL/1000} t · empty ${OEW/1000} t`);
+}
+function table(m){const tb=document.querySelector("#pts tbody");tb.innerHTML="";
+  [["A · max payload at MTOW",m.A],["Design point",m.D],["B · full tanks at MTOW",m.B],["C · ferry, no payload",m.C]].forEach(([n,p])=>{
+    const tr=document.createElement("tr");tr.innerHTML=`<td>${n}</td><td class="n">${fmt(p.pl)} kg</td><td class="n">${fmt(p.f)} kg</td><td class="n">${fmt(p.tow)} kg</td><td class="n">${fmt(p.r)} nm</td>`;tb.appendChild(tr);});}
+function status(m){const s=$("status");
+  if(m.ok){s.className="status";s.textContent=`Design point closes. Needs ${fmt(m.D.f)} kg fuel and ${fmt(m.D.tow)} kg at takeoff (${fmt(S.mtow-m.D.tow)} kg margin).`;}
+  else{s.className="status bad";s.textContent=m.D.f>MAXFUEL?`Does not close: needs ${fmt(m.D.f)} kg of fuel, tanks hold ${fmt(MAXFUEL)} kg.`:`Does not close: takeoff weight ${fmt(m.D.tow)} kg is over MTOW by ${fmt(m.D.tow-S.mtow)} kg.`;}}
+
+/* weight stack */
+function stack(m){const s=$("ws");s.innerHTML="";const W=600,x=40,max=86000,sc=v=>W*v/max;
+  const parts=[["Empty",OEW,css("--line"),0.35],["Payload",m.D.pl,css("--accent"),0.85],["Fuel",m.D.f,css("--ok"),0.6]];let cx=x;
+  parts.forEach(([n,v,c,o])=>{el(s,"rect",{x:cx,y:40,width:sc(v),height:44,fill:c,"fill-opacity":o});
+    el(s,"text",{x:cx+8,y:58,class:"ink"},n);el(s,"text",{x:cx+8,y:76,class:"ink"},`${(v/1000).toFixed(1)} t`);cx+=sc(v);});
+  const mx=x+sc(S.mtow);el(s,"line",{x1:mx,x2:mx,y1:26,y2:100,stroke:css("--bad"),"stroke-width":2});
+  el(s,"text",{x:mx,y:118,"text-anchor":"middle",fill:css("--bad")},`MTOW ${(S.mtow/1000).toFixed(1)} t`);
+  el(s,"text",{x:cx,y:20,"text-anchor":"end",class:"ink"},`Takeoff ${(m.D.tow/1000).toFixed(1)} t`);}
+
+/* mission profile */
+const ms=$("ms");let msPath,plane;
+function mission(){ms.innerHTML="";const g=css("--grid"),l=css("--line"),a=css("--accent");
+  el(ms,"line",{x1:20,x2:680,y1:200,y2:200,stroke:l});
+  const d="M30 200 L60 200 L150 60 L470 60 L540 200 L600 140 a26 14 0 1 0 0.1 0 L670 200";
+  el(ms,"path",{d:"M30 200 L60 200 L150 60 L470 60 L540 200",fill:"none",stroke:l,"stroke-width":2.5});
+  el(ms,"path",{d:"M540 200 L600 140 a26 14 0 1 0 0.1 0 L670 200",fill:"none",stroke:a,"stroke-width":2,"stroke-dasharray":"6 5"});
+  msPath=el(ms,"path",{d,fill:"none",stroke:"none"});
+  [["Taxi + takeoff",30,222,"start"],["Climb",96,120,"end"],["Cruise · Mach 0.78",310,48,"middle"],["Descent",512,120,"start"],["Destination",540,222,"middle"]].forEach(([t,x,y,a])=>el(ms,"text",{x,y,"text-anchor":a,class:"ink"},t));
+  [["Missed approach",572,176,"end"],["30 min hold",626,112,"middle"],["Alternate",676,222,"end"]].forEach(([t,x,y,an])=>el(ms,"text",{x,y,"text-anchor":an,fill:a},t));
+  el(ms,"text",{x:310,y:84,"text-anchor":"middle"},"trip fuel + 5 % contingency");
+  el(ms,"text",{x:626,y:92,"text-anchor":"middle",fill:a},"reserves");
+  plane=el(ms,"circle",{cx:30,cy:200,r:6,fill:a});}
+let flying=null;
+function fly(){const L=msPath.getTotalLength();const t0=performance.now(),dur=6000;cancelAnimationFrame(flying);
+  const step=t=>{const k=Math.min(1,(t-t0)/dur);const p=msPath.getPointAtLength(k*L);plane.setAttribute("cx",p.x);plane.setAttribute("cy",p.y);if(k<1)flying=requestAnimationFrame(step);};
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){const p=msPath.getPointAtLength(L);plane.setAttribute("cx",p.x);plane.setAttribute("cy",p.y);return;}
+  flying=requestAnimationFrame(step);}
+
+/* seats vs range */
+function scatter(){const s=$("sc");s.innerHTML="";const x0=70,x1=670,y0=250,y1=20,R0=2500,R1=4000,P0=120,P1=200;
+  const X=r=>x0+(x1-x0)*(r-R0)/(R1-R0),Y=p=>y0-(y0-y1)*(p-P0)/(P1-P0);const g=css("--grid"),l=css("--line");
+  for(let r=R0;r<=R1;r+=500){el(s,"line",{x1:X(r),x2:X(r),y1:y0,y2:y1,stroke:g});el(s,"text",{x:X(r),y:y0+20,"text-anchor":"middle"},r.toLocaleString("en-US"));}
+  for(let p=P0;p<=P1;p+=20){el(s,"line",{x1:x0,x2:x1,y1:Y(p),y2:Y(p),stroke:g});el(s,"text",{x:x0-10,y:Y(p)+4,"text-anchor":"end"},p);}
+  el(s,"text",{x:(x0+x1)/2,y:y0+44,"text-anchor":"middle",class:"ink"},"Range (nm)");
+  el(s,"text",{x:20,y:(y0+y1)/2,transform:`rotate(-90 20 ${(y0+y1)/2})`,"text-anchor":"middle",class:"ink"},"Seats, two-class");
+  [[2927,162,"737-800",0,-16,"middle"],[3500,178,"737 MAX 8",-10,-12,"end"],[3500,165,"A320neo",12,5,"start"],[3350,150,"A320ceo",12,-10,"start"]].forEach(([r,p,n,dx,dy,an])=>{el(s,"circle",{cx:X(r),cy:Y(p),r:6,fill:l});el(s,"text",{x:X(r)+dx,y:Y(p)+dy,"text-anchor":an,class:"ink"},`${n} · ${p} seats · ${r.toLocaleString("en-US")} nm`);});
+  const tx=X(3000),ty=Y(160);el(s,"circle",{cx:tx,cy:ty,r:14,fill:"none",stroke:css("--accent"),"stroke-width":2,"stroke-dasharray":"4 3"});
+  el(s,"text",{x:tx,y:ty+66,"text-anchor":"middle",class:"acc big"},"Project 160 target · 160 seats · 3,000 nm");el(s,"line",{x1:tx,x2:tx,y1:ty+15,y2:ty+50,stroke:css("--accent"),"stroke-dasharray":"3 3"});}
+
+function update(){$("ldv").textContent=S.ld.toFixed(1);$("sfcv").textContent=S.sfc.toFixed(2);$("mtowv").textContent=(S.mtow/1000).toFixed(1)+" t";$("paxv").textContent=S.pax+` (${(S.pax*0.1).toFixed(1)} t)`;$("rngv").textContent=fmt(S.rng)+" nm";
+  const m=model();drawPR(m);table(m);status(m);stack(m);return m;}
+[["ld",v=>S.ld=+v],["sfc",v=>S.sfc=+v],["mtow",v=>S.mtow=v*1000],["pax",v=>S.pax=+v],["rng",v=>S.rng=+v]].forEach(([id,f])=>$(id).addEventListener("input",e=>{f(e.target.value);update();}));
+$("reset").addEventListener("click",()=>{Object.assign(S,{ld:17,sfc:0.56,mtow:79000,pax:160,rng:3000});$("ld").value=17;$("sfc").value=0.56;$("mtow").value=79;$("pax").value=160;$("rng").value=3000;update();});
+$("draw").addEventListener("click",()=>{const L=lineEl.getTotalLength();ptsG.style.opacity=0;lineEl.style.transition="none";lineEl.style.strokeDasharray=L;lineEl.style.strokeDashoffset=L;lineEl.getBoundingClientRect();
+  lineEl.style.transition="stroke-dashoffset 4s linear";lineEl.style.strokeDashoffset=0;setTimeout(()=>{ptsG.style.transition="opacity .6s";ptsG.style.opacity=1;lineEl.style.strokeDasharray="";},4100);});
+$("fly").addEventListener("click",fly);
+axes();mission();scatter();update();
+})();
+</script>
+</body>
+</html>
